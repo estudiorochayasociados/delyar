@@ -1,0 +1,14 @@
+Options +SymLinksIfOwnerMatch -MultiViews
+RewriteEngine on
+#RewriteBase /
+RewriteCond %{SCRIPT_FILENAME} !-d
+RewriteCond %{SCRIPT_FILENAME} !-f
+RewriteRule ^(.*)$ $1.php
+
+
+RewriteRule ^producto/(.+)_([0-9]+)$ producto.php?id=$2
+RewriteRule ^notas/(.+)_([0-9]+)$ notas.php?id=$2
+RewriteRule ^producto/(.*)$ ./producto.php?id=$1
+RewriteRule ^servicio/(.*)$ ./servicio.php?id=$1
+RewriteRule ^checkout/(.*)$ ./checkout.php?paso=$1
+RewriteRule ^c/(.*)$ ./contenido.php?id=$1
