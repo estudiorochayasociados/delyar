@@ -19,6 +19,7 @@ define("CANONICAL", $_SERVER['HTTP_HOST'] . $_SERVER["REQUEST_URI"]);
 define("USUARIO_DB", "root");
 define("PASS_DB", "");
 define("BASE_DB", "delyar_site");
+define("HUBSPOT", "a222ad54-ed26-4b02-8d4d-5d333f263d71");
 
 function Conectarse()
 {

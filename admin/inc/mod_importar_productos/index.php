@@ -3,10 +3,10 @@ $error = 0;
 $query = '';
 $con = Conectarse();
 
-$headerTabla = "<thead><th>Articulo</th><th>Línea</th><th>Rubro</th><th>Patrón</th><th>Descripción</th><th>Precio</th><th>Stock</th></thead>";
+$headerTabla = "<thead><th>Articulo</th><th>Producto</th><th>Descripcion</th><th>Precio Selecto</th><th>Precio Lista</th><th>Marca</th><th>Categoria</th><th>Subcategoria</th></thead>";
 $columnaImagen = 0;
 $columnaDescripcion = 1;
-$maximoColumnas = "D";
+$maximoColumnas = "H";
 ?>
 <div class="col-md-12">
 	<form action="index.php?op=importarProductos" method="post" enctype="multipart/form-data">
@@ -59,29 +59,26 @@ $maximoColumnas = "D";
 					echo $headerTabla;
 					//Artículo	Descripción	Moneda	Pr.s/iva	Pr.c/iva	Línea	Rubro
 
-					$query = "insert into `productos` (`cod_producto`,`categoria_producto`,`subcategoria_producto`,`patron_producto`,`descripcion_producto`,`precio_producto`,`stock_producto`,`fecha_producto`) VALUES ";
+					$query = "insert into `productos` (`cod_producto`, `patron_producto`, `descripcion_producto`, `precio0_producto`, `precio1_producto`,`marca_producto`, `categoria_producto`, `subcategoria_producto`) VALUES ";
 					$i=0;
-					for($row =2; $row <= $total_rows; $row++) {									 
+					for($row =0; $row <= $total_rows; $row++) {									 
 						$single_row = $sheet->rangeToArray('A' . $row . ':' . $highest_column . $row, NULL, TRUE, FALSE);
 						if ($single_row[0][2]!= '' && $single_row[0][1]!= '' && $single_row[0][3]!= '') {
 							echo "<tr>";		
-							echo "<td>0</td>";							
-							$query .= "('0',";						
+							$query .= "(";						
 							foreach($single_row[0] as $key=>$value) {
 								echo "<td>".$value."</td>";
 								$query .= "'".mysqli_real_escape_string($con, trim($value))."',";	
 							}
 							$query = substr($query, 0, -1);
-							$query .= ",'0','99',NOW()),";
-							echo "<td>0</td>";	
-							echo "<td>99</td>";	
+							$query .= "),";
 							echo "</tr>";
 							$i++;
 						}
 					}
 					$query = substr($query, 0, -1);
 					echo '</table>';
-					//var_dump($query);
+					var_dump($query);
 					unlink($file);		
 					$_SESSION["query"] = $query;			
 				} else {
@@ -98,14 +95,14 @@ $maximoColumnas = "D";
 
 	if(isset($_POST["subir"])) {
 		if(!empty($_SESSION["query"])) {
-			mysqli_query($con, "truncate portfolio");
+			mysqli_query($con, "truncate productos");
 			mysqli_query($con, $_SESSION["query"]);
 			if(mysqli_affected_rows($con) > 0) {
 				echo '<span class="alert alert-success">Base de dato actualizada!</span>';
 			} else {
 				echo '<span class="alert alert-danger">No se pudo subir la base de datos.</span>';
 			}
-		}
+		} 
 	}
 	?>
 </div>

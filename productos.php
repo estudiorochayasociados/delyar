@@ -25,13 +25,31 @@ ob_start();
   <meta property="og:image" content="<?php echo $imagen ?>" />
 
   <?php 
+  $filter = array();
+  $leyenda = '';
   $actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+ 
 
-  $palabra = antihack_mysqli(isset($_GET["palabra"]) ? $_GET["palabra"] : '');      
-  $modelo = antihack_mysqli(isset($_GET["modelo"]) ? $_GET["modelo"] : '');      
-  $marca = antihack_mysqli(isset($_GET["marca"]) ? $_GET["marca"] : '');      
-  $variable = antihack_mysqli(isset($_GET["variable"]) ? $_GET["variable"] : '');      
-  $categoriaA = antihack_mysqli(isset($_GET["categoria"]) ? $_GET["categoria"] : '');      
+  $palabra = antihack_mysqli(isset($_POST["palabra"]) ? $_POST["palabra"] : '');      
+  if($palabra != '') {
+    array_push($filter,'patron_producto = "'.$palabra.'"');
+    $leyenda .= "<b>Palabra:</b> ".$palabra." <button class='btn btn-sm btn-warning' onclick=\"unset('palabra')\"><i class='fa fa-remove'></i></button><br/>"; 
+  }
+  $marca = antihack_mysqli(isset($_POST["marca"]) ? $_POST["marca"] : '');      
+  if($marca != '') {
+    array_push($filter,'marca_producto = "'.$marca.'"');
+    $leyenda .= "<b>Marca:</b> ".$marca." <button class='btn btn-sm btn-warning' onclick=\"unset('marca')\"><i class='fa fa-remove'></i></button><br/>"; 
+  }
+  $categoria = antihack_mysqli(isset($_POST["categoria"]) ? $_POST["categoria"] : '');      
+  if($categoria != '') {
+    array_push($filter,'categoria_producto = "'.$categoria.'"');
+    $leyenda .= "<b>Categoría:</b> ".$categoria." <button class='btn btn-sm btn-warning' onclick=\"unset('categoria')\"><i class='fa fa-remove'></i></button><br/>"; 
+  }
+  $subcategoria = antihack_mysqli(isset($_POST["subcategoria"]) ? $_POST["subcategoria"] : '');      
+  if($subcategoria != '') {
+    array_push($filter,'subcategoria_producto = "'.$subcategoria.'"');
+    $leyenda .= "<b>Subcategoria:</b> ".$subcategoria." <button class='btn btn-sm btn-warning' onclick=\"unset('subcategoria')\"><i class='fa fa-remove'></i></button><br/>"; 
+  } 
   ?>
 </head>
 <body>
@@ -48,38 +66,58 @@ ob_start();
       </div>
     </div>
   </div><br/><br/>
-
-  <form class="container"  role="search" method="get" action="<?php echo BASE_URL ?>/productos.php">   
-    <div class="col-md-6">
-      <input type="text"  name="palabra" value="<?php echo $palabra ?>"  placeholder="Buscar..." class="form-control">
-    </div>
-    <div class="clearfix hidden-lg hidden-md"></div>
-    <div class="col-md-6">
-      <button type="submit" class="btn btn-info"><i class="fa fa-search"></i> BUSCAR</button>
-    </div>
-  </form>  
+  <div class="container">
+    <form class="row"  role="search" method="POST" action="<?php echo BASE_URL ?>/productos.php">   
+      <div class="col-md-2">
+        <b>Palabra:</b><br/>
+        <input type="text"  name="palabra" id="palabra" value="<?php echo $palabra ?>"  placeholder="Buscar..." class="form-control">
+      </div>    
+      <div class="col-md-3">
+        <b>Categoría:</b><br/>
+        <select  onchange="$('form').submit()" name="categoria" id="categoria" class="form-control">
+          <option value=''>Seleccionar Categoria</option>
+          <?php Traer_Filtros_Option($categoria, "categoria_producto",$filter); ?>
+        </select>      
+      </div>
+      <div class="col-md-3">
+        <b>Subcategoria:</b><br/>
+        <select  onchange="$('form').submit()" name="subcategoria" id="subcategoria" class="form-control">
+          <option value=''>Seleccionar Subcategoria</option>
+          <?php Traer_Filtros_Option($subcategoria, "subcategoria_producto",$filter); ?>
+        </select>      
+      </div>
+      <div class="col-md-3">
+        <b>Marca:</b><br/>
+        <select  onchange="$('form').submit()" name="marca" id="marca" class="form-control">
+          <option value=''>Seleccionar Marca</option>
+          <?php Traer_Filtros_Option($marca, "marca_producto",$filter); ?>
+        </select>      
+      </div>
+      <div class="col-md-1"><br/>
+        <button type="submit"  class="btn btn-info"><i class="fa fa-search"></i> BUSCAR</button>
+      </div>
+    </form>  
+  </div>
   <main class="main main-home">
     <div class="container pt-20 pb-20">
       <div id="resultados"></div>
-      <?php if($palabra != '' || $marca != '' || $categoriaA != '') { ?>
-        <div class="col-md-12 ">
+      <?php if($palabra != '' || $marca != '' || $categoria != '' || $subcategoria != '') { ?>
+        <div class=" ">
           <div class="alert alert-info text-uppercase">              
             Estás buscando por:<br/>
-            <?php
-            if($palabra != '') { echo "<b> $palabra </b><br/>";};
-            ?>
+            <?= $leyenda; ?>
           </div>
         </div>
       <?php } ?>
-      <div class="col-md-12 col-lg-12 flex-wrap hidden-sm hidden-xs"> 
+      <div class="hidden-sm hidden-xs"> 
         <?php 
-        Productos_Front($palabra);
+        Productos_Front($filter);
         ?>
       </div>     
 
-      <div class="col-sm-12 col-xs-12 flex-wrap hidden-md hidden-lg"> 
+      <div class="hidden-md hidden-lg"> 
         <?php 
-        Productos_Front_Mobile($palabra);
+        Productos_Front_Mobile($filter);
         ?>
       </div>   
 

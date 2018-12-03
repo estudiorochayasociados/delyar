@@ -23,11 +23,12 @@ $mysql_query = mysqli_query($con, $sql);
 			<?php echo $_SESSION["carritoFinal"]; ?>
 		</tbody>
 	</table>
-	<div class="mb-20" style="font-size:20px">
-		<b>¿Con qué te gustaría abonar?</b>
+	<div class="mb-20 text-center" >
+		<h2 class='text-uppercase'><b>Métodos de Pago</b></h2>
 	</div>
 	<hr/>
 	<?php
+	/*
 require_once 'inc/mercadopago/mercadopago.php';
 if($pagar == 0) {$pagar = 1;}
 $mp              = new MP('3982285456024788', 'cpf7lz1dsRa2iPDC1M0h8QLeqeFRamdj');
@@ -51,39 +52,37 @@ $preference_data = array(
     ),
 );
 
-$preference = $mp->create_preference($preference_data);
+$preference = $mp->create_preference($preference_data);*/
 
-?>
-	<div class="row">
-		<div class="col-md-12">
-			<a href="<?php echo $preference['response']['sandbox_init_point']; ?>" class="btn btn-info btn-block <?php echo $display ?>" name="MP-Checkout" mp-mode="modal">
-				<i class="fa fa-credit-card"></i>
-				PAGO CON TARJETAS DE CRÉDITO
-			</a>
-		</div>
+/*	<div class="row">*/
+/*		<div class="col-md-12">*/
+/*			<a href="<?php echo $preference['response']['sandbox_init_point']; ?>" class="btn btn-info btn-block <?php echo $display ?>" name="MP-Checkout" mp-mode="modal">*/
+/*				<i class="fa fa-credit-card"></i>*/
+/*				PAGO CON TARJETAS DE CRÉDITO*/
+/*			</a>*/
+/*		</div>*/
+/*	</div>*/
+?> 
+<div class="row">
+	<div class="col-md-12">
+		<a href="<?php echo BASE_URL ?>/cierre-checkout.php?pago=1&cod=<?php echo $codigo ?>"  class="btn btn-block btn-success">
+			<i class="fa fa-bank"></i>
+			Pagar con Transferencia Bancaria
+		</a><br/>
 	</div>
-
-	<hr/>
-	<div class="row">
-		<div class="col-md-6">
-			<a href="<?php echo BASE_URL ?>/cierre-checkout.php?pago=1&cod=<?php echo $codigo ?>"  class="btn btn-block btn-success">
-				<i class="fa fa-bank"></i>
-				Pagar con Transferencia Bancaria
-			</a><br/>
-		</div>
-		<div class="col-md-6">
-			<a href="<?php echo BASE_URL ?>/cierre-checkout.php?pago=3&cod=<?php echo $codigo ?>"  class="btn btn-block btn-warning">
-				<i class="fa fa-money"></i>
-				Pagar de contado en sucursal
-			</a><br/>
-		</div>
+	<div class="col-md-12">
+		<a href="<?php echo BASE_URL ?>/cierre-checkout.php?pago=3&cod=<?php echo $codigo ?>"  class="btn btn-block btn-warning">
+			<i class="fa fa-money"></i>
+			Pagar de contado en sucursal
+		</a><br/>
 	</div>
-	<div class="clearfix"></div>
-	<br/>
-	<img src="https://imgmp.mlstatic.com/org-img/banners/ar/medios/785X40.jpg" title="MercadoPago - Medios de pago" alt="MercadoPago - Medios de pago" width="100%" />
-	<script type="text/javascript">
-		(function(){function $MPC_load(){window.$MPC_loaded !== true && (function(){var s = document.createElement("script");s.type = "text/javascript";s.async = true;
-			s.src = document.location.protocol+"//resources.mlstatic.com/mptools/render.js";
-			var x = document.getElementsByTagName('script')[0];x.parentNode.insertBefore(s, x);window.$MPC_loaded = true;})();}
-			window.$MPC_loaded !== true ? (window.attachEvent ? window.attachEvent('onload', $MPC_load) : window.addEventListener('load', $MPC_load, false)) : null;})();
-		</script>
+</div>
+<div class="clearfix"></div>
+<br/>
+<img src="https://imgmp.mlstatic.com/org-img/banners/ar/medios/785X40.jpg" title="MercadoPago - Medios de pago" alt="MercadoPago - Medios de pago" width="100%" />
+<script type="text/javascript">
+	(function(){function $MPC_load(){window.$MPC_loaded !== true && (function(){var s = document.createElement("script");s.type = "text/javascript";s.async = true;
+		s.src = document.location.protocol+"//resources.mlstatic.com/mptools/render.js";
+		var x = document.getElementsByTagName('script')[0];x.parentNode.insertBefore(s, x);window.$MPC_loaded = true;})();}
+		window.$MPC_loaded !== true ? (window.attachEvent ? window.attachEvent('onload', $MPC_load) : window.addEventListener('load', $MPC_load, false)) : null;})();
+	</script>

@@ -52,23 +52,7 @@
 		new WOW().init();
 		$('.carousel').carousel();
 		$('.slider').slider({full_width: true});
-		$('.button-collapse').sideNav({
-			menuWidth: 300,
-			edge: 'left',
-			closeOnClick: true
-		});
-
-		$('#main-slider').flexslider({
-			animation: "slide",
-			animationLoop: false,
-			pauseOnHover: true,
-			smoothHeight: true,
-			itemWidth: 280,
-			itemMargin: 0,
-			minItems: 1,
-			maxItems: 1,
-		});
-
+		 
 	});
 </script>
 
@@ -105,10 +89,8 @@
 				}
 			});
 		});
-	})
-</script>
+	}) 
 
-<script type="text/javascript">
 	function CambiarLocation(url) {
 		$(location).attr('href',url);
 	}
@@ -152,16 +134,11 @@
 
 	$("table").addClass("table-responsive");
 	$("table").addClass("table-hover");
-
-	$('.slick').slick({
-		slidesToShow:5,
-		autoplay: true,
-		infinite: true,
-		arrows:false,
-		autoplaySpeed: 500,
-		centerMode: true,
-		centerPadding: '10px',
-	});
+ 
+	function unset(varPost) { 
+		$("#"+varPost).val('');
+		$("form").submit();
+	}
 </script>
 
 <div id="myModal" class="modal fade">

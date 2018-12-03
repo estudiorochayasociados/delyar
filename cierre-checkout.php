@@ -20,8 +20,8 @@ if (!isset($_SESSION["carrito"])) {
       <div class="container">
         <div>
             <h1>  <i class="material-icons">label_outline</i> Compra</h1>
-      </div>
-  </div>
+        </div>
+    </div>
 </div>
 <div class="container cuerpoContenedor">
   <div class="col-md-12">
@@ -56,7 +56,7 @@ if (!isset($_SESSION["carrito"])) {
         case 1:
         $_SESSION["carritoFinal"] .= '</table><hr><b>Datos del pago:</b><br/><span style="font-size:12px">Transferencia Bancaria</span>';
         echo "<div class='mb-10 alert alert-success btn-block'><b>¡Excelente, finalizaste tu carrito!.</b> <br/>A continuación vas a ver los datos de las cuentas bancarias y también te llegará un correo para que te comuniques con nosotros.</div>";
-        echo '<table class="table table-hovered table-bordered"><thead><th>Nombre producto</th><th>Cantidad</th><th>Precio unidad</th><th>Precio total</th></thead>';
+        echo '<table class="table table-hovered table-bordered"><thead><th>Productos</th><th>Cantidad</th><th>Precio unidad</th><th>Precio total</th></thead>';
         echo $_SESSION["carritoFinal"];
         echo '<div class="clearfix"></div><br/>';
         echo $datosBancarios[1];
@@ -100,7 +100,7 @@ if (!isset($_SESSION["carrito"])) {
         $_SESSION["carritoFinal"] .= '</table><hr><b>Datos del pago:</b><br/><span style="font-size:12px">' . $descripcion . "</span>";
 
         echo "<div class='mb-10 " . $alert . " btn-block'><b>¡Excelente, finalizaste tu carrito!.</b> Tu pago se encuentra en estado: <b>$estadoPago</b>.</div>";
-        echo '<table class="table table-hovered table-bordered" style="text-align:left;width:100%;font-size:13px !important"><thead><th>Nombre producto</th><th>Cantidad</th><th>Precio unidad</th><th>Precio total</th></thead>';
+        echo '<table class="table table-hovered table-bordered" style="text-align:left;width:100%;font-size:13px !important"><thead><th>Productos</th><th>Cantidad</th><th>Precio unidad</th><th>Precio total</th></thead>';
         echo $_SESSION["carritoFinal"];
         echo '<div class="clearfix"></div><br/>';
         echo $contacto[1];
@@ -121,7 +121,7 @@ if (!isset($_SESSION["carrito"])) {
         $_SESSION["carritoFinal"] .= '</table><hr><b>Datos del pago:</b><br/><span style="font-size:12px">De Contado en Sucursal</span>';
 
         echo "<div class='mb-10 alert alert-success btn-block'><b>¡Excelente, finalizaste tu carrito!.</b> <br/>A continuación vas a ver nuestros datos y también te llegará un correo para que te comuniques con nosotros.</div>";
-        echo '<table class="table table-hovered table-bordered" style="text-align:left;width:100%;font-size:13px !important"><thead><th>Nombre producto</th><th>Cantidad</th><th>Precio unidad</th><th>Precio total</th></thead>';
+        echo '<table class="table table-hovered table-bordered" style="text-align:left;width:100%;font-size:13px !important"><thead><th>Productos</th><th>Cantidad</th><th>Precio unidad</th><th>Precio total</th></thead>';
         echo $_SESSION["carritoFinal"];
         echo '<div class="clearfix"></div><br/>';
         echo $contacto[1];
@@ -143,11 +143,11 @@ if (!isset($_SESSION["carrito"])) {
     if ($carrito != '') {
         $asuntoUsuario = $_SESSION["user"]["nombre"] . " gracias por tu nueva compra";
         $asunto        = "Nueva compra de productos";
-        $receptor      = EMAIL;
+        $receptor      = "mhaspert@delyar.com.ar";
         $emailUsuario  = $_SESSION["user"]["email"];
 
         $mensaje = 'Nuevo pedido de productos <br/>';
-        $mensaje .= '<table border="1" style="text-align:left;width:100%;font-size:13px !important"><thead><th>Nombre producto</th><th>Cantidad</th><th>Precio unidad</th><th>Precio total</th></thead>';
+        $mensaje .= '<table border="1" style="text-align:left;width:100%;font-size:13px !important"><thead><th>Productos</th><th>Cantidad</th><th>Precio unidad</th><th>Precio total</th></thead>';
         $mensaje .= $_SESSION["carritoFinal"];
         $mensaje .= '</table>';
         $mensaje .= '<br/><hr/>';
@@ -160,17 +160,14 @@ if (!isset($_SESSION["carrito"])) {
         $mensaje .= "<b>Teléfono</b>: " . $_SESSION["user"]["telefono"] . "<br/>";
 
         $mensajeUsuario = 'Gracias por tu compra<br/><hr/>';
-        $mensajeUsuario .= '<table border="1" style="text-align:left;width:100%;font-size:13px !important"><thead><th>Nombre producto</th><th>Cantidad</th><th>Precio unidad</th><th>Precio total</th></thead>';
+        $mensajeUsuario .= '<table border="1" style="text-align:left;width:100%;font-size:13px !important"><thead><th>Productos</th><th>Cantidad</th><th>Precio unidad</th><th>Precio total</th></thead>';
         $mensajeUsuario .= $_SESSION["carritoFinal"];
         $mensajeUsuario .= '</table>';
         $mensajeUsuario .= '<br/><hr/>';
-        $mensajeUsuario .= '<br/><b>Datos del usuario:</b><br/>';
-        $mensajeUsuario .= "<b>Nombre y apellido</b>: " . $_SESSION["user"]["nombre"] . "<br/>";
-        $mensajeUsuario .= "<b>Email</b>: " . $_SESSION["user"]["email"] . "<br/>";
-        $mensajeUsuario .= "<b>Provincia</b>: " . $_SESSION["user"]["provincia"] . "<br/>";
-        $mensajeUsuario .= "<b>Localidad</b>: " . $_SESSION["user"]["localidad"] . "<br/>";
-        $mensajeUsuario .= "<b>Domicilio</b>: " . $_SESSION["user"]["direccion"] . "<br/>";
-        $mensajeUsuario .= "<b>Teléfono</b>: " . $_SESSION["user"]["telefono"] . "<br/>";
+        if($pago == 1) {
+            $mensajeUsuario .= '<b>Datos bancarios para realizar tu pago:</b><br/>';
+            $mensajeUsuario .= $datosBancarios[1]."<br/>";
+        }
         $mensajeUsuario .= "<br><i><b>Muchas gracias por tu compra, en el transcurso de las 24 hs un representante se estará comunicando con vos.</b></i>";
 
         Enviar_User_Admin($asunto, $mensaje, $receptor);

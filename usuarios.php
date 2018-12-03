@@ -29,7 +29,7 @@ if(!isset($_SESSION["carrito"]) ){
       </div>
       <div class="container cuerpoContenedor"> 
         <div class="col-md-5">
-          <div><h3>Iniciar Sesión</h3></div>
+          <div id="inicio"><h3>Iniciar Sesión</h3></div>
           <hr/>
           <?php
           if (isset($_POST["ingresarBtn"])) {
@@ -38,12 +38,12 @@ if(!isset($_SESSION["carrito"]) ){
             if (!empty($password) && !empty($email)) {
               $data = RLogin($email, $password);
               if($data == 1){
-                echo "<script> document.location.href='".BASE_URL."/sesion.php';</script>";
+                echo "<script> document.location.href='".BASE_URL."/productos.php';</script>";
               }
             }
           }  
           ?>
-          <form method="post">
+          <form method="post" action="<?= BASE_URL ?>/usuarios#inicio">
             <div class="row">
               <div class="col-md-12 col-xs-12">
                 <b>Email</b>
@@ -63,22 +63,21 @@ if(!isset($_SESSION["carrito"]) ){
                   </span>
                 </div>
               </div>
-              <div class="col-md-12 col-xs-6 mt-10 mb-10">
+              <div class="col-md-12 col-xs-12 mt-10 mb-0">
                 <a href="<?php echo BASE_URL ?>/olvidar-contrasena.php" class="linkModal"  data-title="Recordar contraseña">
                   <i class="fa fa-user">
                   </i> ¿Olvidaste tu contraseña?
                 </a>
               </div>
-
-              <div class="col-md-12 col-xs-12"> 
-                <br/>
+              <div class="clearfi"></div>
+              <div class="col-md-12 col-xs-12 mt-10">                 
                 <input class="btn btn-success" type="submit" value="Iniciar Sesión" name="ingresarBtn" />
               </div>      
             </div>
           </form>
         </div>
         <div class="col-md-7">
-          <div ><h3>Registrarme</h3></div>
+          <div id="registro"><h3>Registrarme</h3></div>
           <hr/>
           <?php
           if (isset($_POST["registrarmeBtn"])) {
@@ -97,6 +96,17 @@ if(!isset($_SESSION["carrito"]) ){
            $password1 = antihack_mysqli(isset($_POST["password1"]) ? $_POST["password1"] : '');
            $password2 = antihack_mysqli(isset($_POST["password2"]) ? $_POST["password2"] : '');
 
+           $mensaje = 'Nuevo usuario registrado con los datos:<br/>';
+           $mensaje .= "<b>NOMBRE Y APELLIDO:</b> ".$nombreFinal."<br/>";
+           $mensaje .= "<b>EMAIL:</b> ".$email."<br/>";
+           $mensaje .= "<b>CUIT / DNI:</b> ".$dni."<br/>";
+           $mensaje .= "<b>POSTAL:</b> ".$postal."<br/>";
+           $mensaje .= "<b>TELÉFONO:</b> ".$telefono."<br/>";
+           $mensaje .= "<b>DIRECCIÓN:</b> ".$direccion."<br/>";
+           $mensaje .= "<b>LOCALIDAD:</b> ".$localidad."<br/>";
+           $mensaje .= "<b>PROVINCIA:</b> ".$provincia."<br/>";
+           $mensaje .= "<b>CONTRASEÑA:</b> ".$password1."<br/>";
+
            if (!empty($nombre) && !empty($password1) && !empty($password2) && !empty($email)) {
             if ($password1 == $password2) {
              $emailRevisar = Revisar_Email("usuarios", "email", $_POST["email"]);
@@ -107,12 +117,12 @@ if(!isset($_SESSION["carrito"]) ){
                   array('property' => 'email','value' => $email),
                   array('property' => 'firstname','value' =>  $nombre),
                   array('property' => 'lastname','value' =>  $apellido),
-                  array('property' => 'phone','value' => $telefono)
+                  array('property' => 'phone','value' => $telefono)                  
                 )
               );
 
               $url = "https://api.hubapi.com/contacts/v1/contact";
-              //Hubspot_Dev($array,$url,"NOTES");
+              Hubspot_Dev($array,$url,"NOTES");
 
               $sql = "INSERT INTO `usuarios`
               (`nombre`, `email`, `pass`, `cuit`, `postal`, `telefono`, `direccion`, `localidad`, `provincia`, `inscripto`,`invitado`) 
@@ -121,6 +131,11 @@ if(!isset($_SESSION["carrito"]) ){
 
               $link = Conectarse();
               $r = mysqli_query($link,$sql);
+
+              Enviar_User("Gracias por tu registro", "Gracias por registrate en nuestra plataforma.<br/>Nuestros vendedores se comunicarán con vos para poder confirmar los datos que nos brindaste y darte la herramienta de comercio electrónico para que gestiones tus compras donde quieras.", $email);
+
+              Enviar_User_Admin("Nuevo usuario registrado", $mensaje, "mhaspert@delyar.com.ar");
+
               echo "<div class='alert alert-success'>Excelente! Tu cuenta fue creada exitosamente, nuestros vendedores se comunicarán con vos para poder confirmar los datos que nos brindaste y darte la herramienta de comercio electrónico para que gestiones tus compras donde quieras.</div>";
             } else {
               echo "<div class='alert alert-danger'>Lo sentimos el correo electrónico ya existe.</div>";
@@ -133,7 +148,7 @@ if(!isset($_SESSION["carrito"]) ){
         }
       }
       ?>
-      <form method="post" >
+      <form method="post" action="<?= BASE_URL ?>/usuarios#registro">
         <div class="row">
           <label class="mb-20 col-md-6 col-xs-12">
             Nombre
@@ -181,9 +196,9 @@ if(!isset($_SESSION["carrito"]) ){
             </div>
           </label> 
           <label class="mb-20 col-md-6 col-xs-12">
-            DNI
+            CUIT / DNI
             <div class="input-group">
-              <input class="form-control" type="text" placeholder="Escribir tu DNI"  onkeypress="return onlyNumbersDano(event)" name="dni" value="<?= isset($_POST["dni"]) ? $_POST["dni"] : ''; ?>"/>
+              <input class="form-control" required type="text" placeholder="Escribir tu DNI"  onkeypress="return onlyNumbersDano(event)" name="dni" value="<?= isset($_POST["dni"]) ? $_POST["dni"] : ''; ?>"/>
               <span class="input-group-addon">
                 <i class="glyphicon glyphicon-barcode"></i>
               </span>
@@ -219,11 +234,11 @@ if(!isset($_SESSION["carrito"]) ){
           <label class="mb-20 col-md-6 col-xs-12">
             Provincia
             <div class="input-group">
-             <select class="pull-right form-control" name="provincia" id="provincia" placeholder="Escribir tu provincia" required>
+             <select class="pull-right form-control" name="provincia" id="provincia"  required>
               <?php if(isset($_POST["provincia"])) { ?>
                 <option value="<?= $_POST["provincia"] ?>" selected><?= $_POST["provincia"] ?></option>
               <?php } ?>
-              <option>Provincia</option>
+              <option value="" >Provincia</option>
               <?php Provincias_Read_Front() ?>
             </select>
             <span class="input-group-addon">
@@ -238,7 +253,7 @@ if(!isset($_SESSION["carrito"]) ){
               <?php if(isset($_POST["localidad"])) { ?>
                 <option value="<?= $_POST["localidad"] ?>" selected><?= $_POST["localidad"] ?></option>     
               <?php } ?>
-              <option>Localidad</option>        
+              <option value="" >Localidad</option>        
             </select>
             <span class="input-group-addon">
               <i class="glyphicon glyphicon-map-marker"></i>

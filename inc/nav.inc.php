@@ -15,29 +15,30 @@ if ($index == "" && $empresa == "" && $servicios == "" && $productos == "" && $n
 <div class="pre-head">
   <div class="container">
     <div class="row">
-      <div class="col-sm-6 col-xs-12">
+      <div class="col-sm-5 col-xs-12 hidden-xs hidden-sm">
       </div>
-      <div class="col-sm-6 col-xs-12 text-right zindex">
-        <span>03564 427633 / 437047 / 436226</span>
+      <div class="col-sm-7 col-xs-12 headerTop zindex text-right">
+        <span class="mr-20 hidden-xs hidden-sm">03564 427633 / 437047 / 436226</span>
          <?php if (isset($_SESSION["user"]["id"])) {?>
-          <a href="<?php echo BASE_URL ?>/usuarios" >
+          <a  class="mr-10" href="<?php echo BASE_URL ?>/usuarios" >
             <b><i class="fa fa-user"></i> <?=$_SESSION["user"]["nombre"]?></b>
           </a> |
-          <a href="<?php echo BASE_URL; ?>/sesion?op=salir" >
+          <a    href="<?php echo BASE_URL; ?>/sesion?op=salir" >
             <b><i class="fa fa-sign-out" aria-hidden="true"></i> SALIR</b>
           </a>
         <?php } else {?>
-          <a href="<?php echo BASE_URL ?>/usuarios" >
-            <b><i class="fa fa-user"></i>  INGRESAR</b>
+          <a  class="mr-10" href="<?php echo BASE_URL ?>/usuarios#inicio" >
+            <b><i class="fa fa-user"></i>  Ingresá </b>
           </a>
-          <a href="<?php echo BASE_URL ?>/usuarios" >
-            <b><i class="fa fa-user"></i>  REGISTRARME</b>
+          <a class="mr-10">o</a>
+          <a    href="<?php echo BASE_URL ?>/usuarios#registro" >
+            <b> <i class="fa fa-user"></i>  Registrate!</b>
           </a>
         <?php }?>
 
         <?php if (isset($_SESSION["carrito"][0])) {?>
          | <a href="<?php echo BASE_URL ?>/carrito" >
-          <b><i class="fa fa-shopping-cart"></i> VER CARRITO</b>
+          <b><i class="fa fa-shopping-cart"></i> PEDIDO</b>
         </a>
       <?php }
        
@@ -59,7 +60,7 @@ if ($index == "" && $empresa == "" && $servicios == "" && $productos == "" && $n
       <i class="fa fa-bars" aria-hidden="true"></i>
     </button>
   </div>
-  <div class="mg-top-50 pd-navv collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+  <div class=" pd-navv collapse navbar-collapse" id="bs-example-navbar-collapse-1">
    <ul class="mg-top-10 nav navbar-nav navbar-right">
     <li><a class="nava <?php if ($index || $vacio) {echo 'active';}?>" href="<?php echo BASE_URL ?>/index" alt="INICIO" title="INICIO"><img class="mg-top-n10" src="<?php echo BASE_URL; ?>/img/png/home.png" width="30" /> INICIO</a></li>
     <li><a class="nava <?php if ($empresa) {echo 'active';}?>" href="<?php echo BASE_URL ?>/empresa" alt="EMPRESA" title="EMPRESA"><img class="mg-top-n10" src="<?php echo BASE_URL; ?>/img/png/heart.png" width="30" /> EMPRESA</a></li>

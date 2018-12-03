@@ -1059,21 +1059,18 @@ function Notas_Read_Front_2($a)
 }
 }
 
-function Productos_Front($palabra)
+function Productos_Front($filtro)
 {
-  if ($palabra != '') {
-    $buscar = "AND descripcion_producto LIKE '%$palabra%'";
-    $buscar .= " OR categoria_producto LIKE '%$palabra%'";
-    $buscar .= " OR patron_producto LIKE '%$palabra%'";
-    $buscar .= " OR subcategoria_producto LIKE '%$palabra%'";
-  } else {
-    $buscar = '';
-  }
-
   require_once "paginacion/Zebra_Pagination.php";
   $con = Conectarse_Mysqli();
+  $queryFilter = '';
+  $countFilter = count($filtro);
+  
+  if($countFilter != 0) {
+    $queryFilter = "WHERE ".implode(" AND ",$filtro);
+  }
 
-  $query = "SELECT * FROM `productos` WHERE categoria_producto != '' $buscar ORDER BY id_producto Desc";
+  $query = "SELECT * FROM `productos` $queryFilter ORDER BY id_producto Desc";
   $res   = $con->query($query);
 
   $num_registros  = mysqli_num_rows($res);
@@ -1081,13 +1078,13 @@ function Productos_Front($palabra)
   $paginacion     = new Zebra_Pagination();
   $paginacion->records($num_registros);
   $paginacion->records_per_page($resul_x_pagina);
-  $consulta = "SELECT * FROM  `productos` WHERE categoria_producto != '' $buscar ORDER BY id_producto Desc
+  $consulta = "SELECT * FROM  `productos` $queryFilter ORDER BY id_producto Desc
 
   LIMIT " . (($paginacion->get_page() - 1) * $resul_x_pagina) . ',' . $resul_x_pagina;
   $result = $con->query($consulta);
   ?>
   <table class="tablap" width="100%">
-    <tr><th>Código</th><th>Producto</th><th>Descripción</th><th>Línea</th><th>Marca</th><th>Stock</th><th>Precio</th><th></th></tr>
+    <tr><th>Código</th><th>Producto</th><th>Descripción</th><th>Marca</th><th>Categoría</th><th>Subcategoría</th><th>Precio</th><th></th></tr>
     <?php
     while ($row = mysqli_fetch_array($result)) {
 
@@ -1097,25 +1094,29 @@ function Productos_Front($palabra)
       $cod          = (trim($row["cod_producto"]));
       $patron       = (trim($row["patron_producto"]));
       $descripcion  = (trim($row["descripcion_producto"]));
+      $marca  = (trim($row["marca_producto"]));
       $categoria    = ($row["categoria_producto"]);
       $subcategoria = ($row["subcategoria_producto"]);
-      $stock        = (trim($row["stock_producto"]));
-      $precio       = (trim($row["precio".$_SESSION["user"]["lista"]."_producto"]));
+      if(isset($_SESSION["user"]["lista"])) {
+        $precio       = "$".(trim($row["precio".$_SESSION["user"]["lista"]."_producto"]));
+      } else {
+        $precio       = '';
+      }
       ?>
 
       <tr>
         <td><?php echo $cod; ?></td>
         <td><?php echo $patron; ?></td>
         <td><?php echo $descripcion; ?></td>
+        <td><?php echo $marca; ?></td>
         <td><?php echo $categoria; ?></td>
         <td><?php echo $subcategoria; ?></td>
-        <td><?php echo $stock; ?></td>
         <td>
-          <?php if(isset($_SESSION["user"])) { echo $precio; } else { echo "<a href='".BASE_URL."/usuarios'  class='btn btn-default' data-toggle='tooltip' data-placement='top' title='Para visualizar los precios de nuestros productos debe estar registrado en nuestro base de clientes.'>Registrarme!</a>";}; ?>            
+          <?php if(isset($_SESSION["user"])) { echo $precio; } else { echo "<a href='".BASE_URL."/usuarios#registro'  class='btn btn-default' data-toggle='tooltip' data-placement='top' title='Para visualizar los precios de nuestros productos debe estar registrado en nuestro base de clientes.'>Registrarme!</a>";}; ?>            
         </td>
         <td>
          <?php if(isset($_SESSION["user"])) { ?>
-          <a href="<?php echo BASE_URL ?>/api/carrito/agregar_a_carrito.php?idProducto=<?php echo $id ?>" class="linkModal  btn btn-info btn-sm" data-title="Agregar a Carrito">
+          <a href="<?php echo BASE_URL ?>/api/carrito/agregar_a_carrito.php?idProducto=<?php echo $id ?>" class="linkModal  btn btn-info btn-sm" data-title="Agregar a mi pedido">
             <i class="fa fa-shopping-cart"></i> Comprar
           </a>
         <?php } ?>
@@ -1132,21 +1133,19 @@ $paginacion->render();
 echo "</center><br/><br/>";
 }
 
-function Productos_Front_Mobile($palabra)
+function Productos_Front_Mobile($filtro)
 {
-  if ($palabra != '') {
-    $buscar = "AND descripcion_producto LIKE '%$palabra%'";
-    $buscar .= " OR categoria_producto LIKE '%$palabra%'";
-    $buscar .= " OR patron_producto LIKE '%$palabra%'";
-    $buscar .= " OR subcategoria_producto LIKE '%$palabra%'";
-  } else {
-    $buscar = '';
-  }
 
   require_once "paginacion/Zebra_Pagination.php";
   $con = Conectarse_Mysqli();
+  $queryFilter = '';
+  $countFilter = count($filtro);
+  
+  if($countFilter != 0) {
+    $queryFilter = "WHERE ".implode(" AND ",$filtro);
+  }
 
-  $query = "SELECT * FROM `productos` WHERE categoria_producto != '' $buscar ORDER BY id_producto Desc";
+  $query = "SELECT * FROM `productos` $queryFilter ORDER BY id_producto Desc";
   $res   = $con->query($query);
 
   $num_registros  = mysqli_num_rows($res);
@@ -1154,7 +1153,7 @@ function Productos_Front_Mobile($palabra)
   $paginacion     = new Zebra_Pagination();
   $paginacion->records($num_registros);
   $paginacion->records_per_page($resul_x_pagina);
-  $consulta = "SELECT * FROM  `productos` WHERE categoria_producto != '' $buscar ORDER BY id_producto Desc
+  $consulta = "SELECT  * FROM `productos` $queryFilter ORDER BY id_producto Desc
 
   LIMIT " . (($paginacion->get_page() - 1) * $resul_x_pagina) . ',' . $resul_x_pagina;
   $result = $con->query($consulta);
@@ -1169,22 +1168,28 @@ function Productos_Front_Mobile($palabra)
     $patron       = (trim($row["patron_producto"]));
     $descripcion  = (trim($row["descripcion_producto"]));
     $categoria    = ($row["categoria_producto"]);
+    $marca = ($row["marca_producto"]);
     $subcategoria = ($row["subcategoria_producto"]);
-    $stock        = (trim($row["stock_producto"]));
-    $precio       = (trim($row["precio".$_SESSION["user"]["lista"]."_producto"]));
+    if(isset($_SESSION["user"]["lista"])) {
+      $precio       = "$".(trim($row["precio".$_SESSION["user"]["lista"]."_producto"]));
+    } else {
+      $precio       = '';
+    }  
     ?>
 
     <br/><div class="boxcompra col-sm-12" >
-      <p>Código: <?php echo $cod; ?></p>
-      <p>Patrón: <?php echo $patron; ?></p>
-      <p>Descripción: <?php echo $descripcion; ?></p>
-      <p>Línea: <?php echo $categoria; ?></p>
-      <p>Marca: <?php echo $subcategoria; ?></p>
-      <p>Stock: <?php echo $stock; ?></p>
-      <p>Precio: $<?php echo $precio; ?></p>
-      <a href="<?php echo BASE_URL ?>/api/carrito/agregar_a_carrito.php?idProducto=<?php echo $id ?>" class="linkModal  btn btn-info btn-sm" data-title="Agregar a Carrito">
-        <i class="fa fa-shopping-cart"></i> Comprar
-      </a>
+      <p><b>Código:</b> <?php echo $cod; ?></p>
+      <p><b>Patrón:</b> <?php echo $patron; ?></p>
+      <p><b>Descripción:</b> <?php echo $descripcion; ?></p>
+      <p><b>Marca:</b> <?php echo $marca; ?></p>
+      <p><b>Categoria:</b> <?php echo $categoria; ?></p>
+      <p><b>Subcategoria:</b> <?php echo $subcategoria; ?></p>
+      <p><b>Precio:</b> <?php if(isset($_SESSION["user"])) { echo $precio; } else { echo "<a href='".BASE_URL."/usuarios#registro'  class='btn btn-default' data-toggle='tooltip' data-placement='top' title='Para visualizar los precios de nuestros productos debe estar registrado en nuestro base de clientes.'>Registrarme!</a>";}; ?> </p>
+      <?php if(isset($_SESSION["user"])) { ?>
+        <a href="<?php echo BASE_URL ?>/api/carrito/agregar_a_carrito.php?idProducto=<?php echo $id ?>" class="linkModal  btn btn-info btn-sm" data-title="Agregar a mi pedido">
+          <i class="fa fa-shopping-cart"></i> Comprar
+        </a>
+      <?php } ?>
     </div>
 
     <?php
@@ -1218,22 +1223,22 @@ function TraerPedidos($id)
              <?php
              switch ($row["estado_pedidos"]) {
               case 0:
-              echo "<span  style='padding:4px;font-size:13px;margin-top:-3px' class='btn-warning pull-right'>Estado: Pago pendiente</span>";
+              echo "<span  class='label label-warning pull-right'>Estado: Pago pendiente</span>";
               $leyenda = "<b>Estaríamos necesitando el pago para poder proseguir con el pedido solicitado.</b>
-              <br/>Por favor comunicarse a: <br/><br/>" . $contacto[1];
+              <br/>Por favor comunicarse a:<hr/>" . $contacto[1];
               break;
               case 1:
-              echo "<span  style='padding:4px;font-size:13px;margin-top:-3px' class='btn-success fRight'>Estado: Pago exitoso</span>";
+              echo "<span  class='label label-success pull-right'>Estado: Pago exitoso</span>";
               $leyenda = "<b>Excelente el pago fue acreditado, para poder proseguir con el pedido solicitado.</b>
-              <br/>Por favor comunicarse a:<br/><br/>
+              <br/>Por favor comunicarse a:<hr/>
               <b>" . TITULO . "</b>" . $contacto[1];
               break;
               case 2:
-              echo "<span  style='padding:4px;font-size:13px;margin-top:-3px' class='btn-danger pull-right'>Estado: Pago erroneo</span>";
-              $leyenda = "<b>Tuvimos problemas con el pago para poder proseguir con el pedido solicitado.</b><br/>Por favor comunicarse a:<br/><br/><b>" . TITULO . "</b>" . $contacto[1];
+              echo "<span  class='label label-danger pull-right'>Estado: Pago erroneo</span>";
+              $leyenda = "<b>Tuvimos problemas con el pago para poder proseguir con el pedido solicitado.</b><br/>Por favor comunicarse a:<hr/><b>" . TITULO . "</b>" . $contacto[1];
               break;
               case 3:
-              echo "<span  style='padding:4px;font-size:13px;margin-top:-3px' class='btn-info pull-right'>Estado: Enviado</span>";
+              echo "<span  class='label label-info pull-right'>Estado: Enviado</span>";
               $leyenda = "<b>Excelente el pago y el envío fueron exitosos.<br/>Muchas gracias por su compra.</b>" . $contacto[1];
               break;
             }
@@ -1291,23 +1296,23 @@ function TraerPedidos_Admin($tipo)
              <?php
              switch ($row["estado_pedidos"]) {
               case 0:
-              echo "<span  style='padding:4px;font-size:13px;margin-top:-3px' class='btn-warning fRight'>Estado: Pago pendiente</span>";
+              echo "<span  class='label label-warning pull-right'>Estado: Pago pendiente</span>";
               $leyenda = "<b>Estaríamos necesitando el pago para poder proseguir con el pedido solicitado.</b>";
               break;
               case 1:
-              echo "<span  style='padding:4px;font-size:13px;margin-top:-3px' class='btn-success fRight'>Estado: Pago exitoso</span>";
+              echo "<span  class='label label-success pull-right'>Estado: Pago exitoso</span>";
               $leyenda = "<b>Excelente el pago fue acreditado, para poder proseguir con el pedido solicitado.</b>";
               break;
               case 2:
-              echo "<span  style='padding:4px;font-size:13px;margin-top:-3px' class='btn-danger fRight'>Estado: Pago erroneo</span>";
+              echo "<span  class='label label-danger pull-right'>Estado: Pago erroneo</span>";
               $leyenda = "<b>Tuvimos problemas con el pago para poder proseguir con el pedido solicitado.</b>";
               break;
               case 3:
-              echo "<span  style='padding:4px;font-size:13px;margin-top:-3px' class='btn-info fRight'>Estado: Enviado</span>";
+              echo "<span  class='label label-info pull-right'>Estado: Enviado</span>";
               $leyenda = "<b>Excelente el pago y el envío fueron exitosos.<br/>Muchas gracias por su compra.</b>";
               break;
               case 9:
-              echo "<span  style='padding:4px;font-size:13px;margin-top:-3px' class='btn-info fRight'>Estado: Carrito no cerrado</span>";
+              echo "<span  class='label label-info pull-right'>Estado: Carrito no cerrado</span>";
               $leyenda = "Carrito no finalizado";
               break;
             }
@@ -2400,7 +2405,7 @@ function RLogin($usuario, $clave)
       $_SESSION["user"] = $data;
       return 1;
     } else {
-      echo "<span class='alert alert-warning btn-block'><i class='fa fa-info-circle'></i> Tu cuenta no fue verificada por nuestros vendedores. Envianos un email y te respondemos por qué no fue activada. (<a href='mailto:administracion@delyar.com.ar' target='_blank'>administracion@delyar.com.ar</a>)</span>";
+      echo "<span class='alert alert-warning btn-block'><i class='fa fa-info-circle'></i> Tu cuenta no fue verificada por nuestros vendedores. Envianos un email y te respondemos por qué no fue activada. (<a href='mailto:mhaspert@delyar.com.ar' target='_blank'>mhaspert@delyar.com.ar</a>)</span>";
       return 0;  
     }    
   } else {
@@ -2653,6 +2658,51 @@ function Provincias_Read_Front()
     ?>
     <option value="<?php echo limpiar_caracteres_especiales($row[0]) ?>"><?php echo mb_strtoupper($row[0]) ?></option>
     <?php
+  }
+}
+
+
+function Traer_Filtros_Option($seleccion,$filtro,$query)
+{
+  $countFilter = count($query);
+  if($countFilter != 0) {
+    $queryFilter = "WHERE ".implode(" AND ",$query);
+  } else {
+    $queryFilter = '';
+  }
+  $idConn    = Conectarse_Mysqli();
+  $sql       = "SELECT $filtro FROM  `productos` $queryFilter GROUP BY $filtro ORDER BY $filtro ASC";
+  echo $sql;
+  $resultado = mysqli_query($idConn, $sql);
+  while ($row = mysqli_fetch_row($resultado)) {
+    if($seleccion == limpiar_caracteres_especiales($row[0])) {
+      ?>
+      <option value="<?php echo limpiar_caracteres_especiales($row[0]) ?>" selected><?php echo mb_strtoupper($row[0]) ?></option>
+      <?php
+    } else {
+      ?>
+      <option value="<?php echo limpiar_caracteres_especiales($row[0]) ?>"><?php echo mb_strtoupper($row[0]) ?></option>
+      <?php
+    }
+  }
+}
+
+function Traer_Filtros_Option_Subcategoria($seleccion,$categoria, $filtro)
+{
+  $idConn    = Conectarse_Mysqli();
+  $sql       = "SELECT $filtro FROM  `productos` WHERE $categoria = '$valor' GROUP BY $filtro ORDER BY $filtro ASC";
+  echo $sql;
+  $resultado = mysqli_query($idConn, $sql);
+  while ($row = mysqli_fetch_row($resultado)) {
+    if($seleccion == $row[0]) {
+      ?>
+      <option value="<?php echo $row[0] ?>" selected><?php echo mb_strtoupper($row[0]) ?></option>
+      <?php
+    } else {
+      ?>
+      <option value="<?php echo $row[0] ?>"><?php echo mb_strtoupper($row[0]) ?></option>
+      <?php
+    }
   }
 }
 
@@ -3292,13 +3342,12 @@ function Enviar_User($asunto, $mensaje, $receptor)
   $mail          = new PHPMailer();
   $mail->CharSet = 'UTF-8';
   $mail->IsSMTP();
-  $mail->SMTPDebug = 1;
   $mail->SMTPAuth  = true;
   $mail->Host      = SMTP_EMAIL;
   $mail->Port      = 587;
   $mail->Username  = EMAIL;
   $mail->Password  = PASS_EMAIL;
-  $mail->SetFrom(EMAIL, TITULO);
+  $mail->SetFrom("mhaspert@delyar.com.ar", TITULO);
   $fecha    = date("Y-m-d H:i:s");
   $pie      = Contenido_TraerPorId("pie email");
   $cabecera = Contenido_TraerPorId("cabecera email");
@@ -3310,7 +3359,6 @@ function Enviar_User($asunto, $mensaje, $receptor)
   <img src='" . LOGO . "' style='width:230px'>
   </div>
   <div style='width:700px;margin:auto;padding:20px;background:#fff;'>
-  <h3>¡Hola! ¿cómo estás?</h3>
   <p style='font-size:14px'>$mensaje</p><br/>
   <span style='font-size:13px'>
   <b>" . TITULO . "</b>
@@ -3345,13 +3393,12 @@ function Enviar_User_Admin($asunto, $mensaje, $receptor)
   $mail->CharSet = 'UTF-8';
 
   $mail->IsSMTP();
-  $mail->SMTPDebug = 1;
   $mail->SMTPAuth  = true;
   $mail->Host      = SMTP_EMAIL;
   $mail->Port      = 587;
   $mail->Username  = EMAIL;
   $mail->Password  = PASS_EMAIL;
-  $mail->SetFrom(EMAIL, TITULO);
+  $mail->SetFrom("mhaspert@delyar.com.ar", TITULO);
   $fecha    = date("Y-m-d H:i:s");
   $pie      = Contenido_TraerPorId("pie email");
   $cabecera = Contenido_TraerPorId("cabecera email");
@@ -3363,7 +3410,6 @@ function Enviar_User_Admin($asunto, $mensaje, $receptor)
   <img src='" . LOGO . "' style='width:230px'>
   </div>
   <div style='width:700px;margin:auto;padding:20px;background:#fff;'>
-  <h3>¡Hola! ¿cómo estás?</h3>
   <p style='font-size:14px'>$mensaje</p><br/>
   <span style='font-size:13px'>
   <b>" . TITULO . "</b>
@@ -3588,6 +3634,10 @@ function Hubspot_AddContact($email, $nombre, $apellido, $telefono, $localidad, $
   );
   $url = "https://api.hubapi.com/contacts/v1/contact";
   Hubspot_Dev($array, $url, "NOTES");
+}
+
+function unsetPost($key) {
+  unset($_POST[$key]);  
 }
 
 ?>
